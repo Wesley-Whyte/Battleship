@@ -12,6 +12,7 @@ struct player
     int Ships[10];
 };
 
+void breaker();
 void clrscr();
 void chooseColumn();
 

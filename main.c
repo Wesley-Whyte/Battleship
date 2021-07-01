@@ -18,7 +18,7 @@ int main()
 void startGame()
 {
     int input;
-    printf("Start Game? Enter\n"
+    printf("Start New Game? Enter\n"
            "1. Yes\n"
            "2. No\n");
     scanf("%d",&input);
@@ -37,14 +37,14 @@ void startGame()
 
         default:
             printf("Invalid Input. Try again\n");
-            printf("Start Game? Enter\n"
+            printf("Start New Game? Enter\n"
                    "1. Yes\n"
                    "2. No\n");
             scanf("%d",&input);
             break;
             }
         clrscr();//FOr when you come back out
-        printf("Start Game? Enter\n"
+        printf("Start New Game? Enter\n"
                "1. Yes\n"
                "2. No\n");
         scanf("%d",&input);

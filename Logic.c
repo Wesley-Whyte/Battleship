@@ -14,10 +14,14 @@ void onePlayerGame()
     Player player1;
     Player player2;
 
+    int turntracker = 1;//Player 1 goes first
+                        //1. for player 1's turn
+                        //2. for player 2's turn
     int turn;//set to
-             //1. for player 1
-             //2. for player 2
+             //1. to keep turn
+             //2. to switch turns
              //0.to end game
+
 
     playerInit(&player1);
     playerInit(&player2);
@@ -33,43 +37,77 @@ void onePlayerGame()
     {
         placeBattleShips(player1.Board,player1.Heur,player1.Ships[i],i,player1.name);
     }
-    //let player two set his battleships
+    clrscr();
+    printf("%s has placed his battleships\n",player1.name);
+    displayBoard(player1.Board);
+    breaker();
+    //let computer set his battleships
     for(int i = size - 1;i >= 0;i--)
     {
         autoPlaceBattleShips(player2.Board,player2.Heur,player2.Ships[i],i,player2.name);
     }
+    clrscr();
+    printf("%s has placed his battleships\n",player2.name);
+    breaker();
 
     //take turns playing
-    turn = 1;//lets player 1 go first
+    if(turntracker == 1)
+    {
+        turn = runTurn(&player1,&player2);
+    }
+    else if(turntracker == 2)
+    {
+        turn = autoRunTurn(&player2,&player1);
+    }
+
     while(turn != 0)
     {
         switch(turn)
         {
-        case 1:
-            //Player 1 runTurn()
-            if(runTurn(&player1,&player2) == 0)
+        case 1://Depending on whose turn it was before they'll play again
+            if(turntracker == 1)
             {
-                turn = 0;//End game
+                turn = runTurn(&player1,&player2);
             }
-            else
+            else if(turntracker == 2)
             {
-                turn = 2;//Switch to player 2's turn
+                turn = autoRunTurn(&player2,&player1);
             }
+
             break;
 
-        case 2:
-            //Player 2 runTurn()
-            if(autoRunTurn(&player2,&player1) == 0)
+        case 2://First switch turns
+            if(turntracker == 1)
             {
-                turn = 0;//End game
+                turntracker = 2;
             }
-            else
+            else if(turntracker == 2)
             {
-                turn = 1;//Switch to player 1's turn
+                turntracker = 1;
             }
+            //Then let the next person play their turn
+            if(turntracker == 1)
+            {
+                turn = runTurn(&player1,&player2);
+            }
+            else if(turntracker == 2)
+            {
+                turn = autoRunTurn(&player2,&player1);
+            }
+
             break;
         }
     }
+    printf("Game over.\n");
+    if(turntracker == 1)
+    {
+        printf("%s wins",player1.name);
+    }
+    else if(turntracker == 2)
+    {
+        printf("%s wins",player2.name);
+    }
+    breaker();
 
 }
 ///
@@ -80,11 +118,14 @@ void twoPlayerGame()
     typedef struct player Player;
     Player player1;
     Player player2;
-
+    int turntracker = 1;//Player 1 goes first
+                        //1. for player 1's turn
+                        //2. for player 2's turn
     int turn;//set to
-             //1. for player 1
-             //2. for player 2
+             //1. to keep turn
+             //2. to switch turns
              //0.to end game
+
 
     playerInit(&player1);
     playerInit(&player2);
@@ -100,46 +141,78 @@ void twoPlayerGame()
     {
         placeBattleShips(player1.Board,player1.Heur,player1.Ships[i],i,player1.name);
     }
+    clrscr();
+    printf("%s has placed his battleships\n",player1.name);
+    displayBoard(player1.Board);
+    breaker();
     //let player two set his battleships
     for(int i = size - 1;i >= 0;i--)
     {
         placeBattleShips(player2.Board,player2.Heur,player2.Ships[i],i,player2.name);
     }
+    clrscr();
+    printf("%s has placed his battleships\n",player2.name);
+    displayBoard(player2.Board);
+    breaker();
 
     //take turns playing
-    turn = 1;//lets player 1 go first
+    if(turntracker == 1)
+    {
+        turn = runTurn(&player1,&player2);
+    }
+    else if(turntracker == 2)
+    {
+        turn = runTurn(&player2,&player1);
+    }
+
     while(turn != 0)
     {
         switch(turn)
         {
-        case 1:
-            //Player 1 runTurn()
-            if(runTurn(&player1,&player2) == 0)
+        case 1://Depending on whose turn it was before they'll play again
+            if(turntracker == 1)
             {
-                turn = 0;//End game
+                turn = runTurn(&player1,&player2);
             }
-            else
+            else if(turntracker == 2)
             {
-                turn = 2;//Switch to player 2's turn
+                turn = runTurn(&player2,&player1);
             }
+
             break;
 
-        case 2:
-            //Player 2 runTurn()
-            if(runTurn(&player2,&player1) == 0)
+        case 2://First switch turns
+            if(turntracker == 1)
             {
-                turn = 0;//End game
+                turntracker = 2;
             }
-            else
+            else if(turntracker == 2)
             {
-                turn = 1;//Switch to player 1's turn
+                turntracker = 1;
             }
+            //Then let the next person play their turn
+            if(turntracker == 1)
+            {
+                turn = runTurn(&player1,&player2);
+            }
+            else if(turntracker == 2)
+            {
+                turn = runTurn(&player2,&player1);
+            }
+
             break;
         }
     }
-
-
-
+    printf("Game over.\n");
+    if(turntracker == 1)
+    {
+        printf("%s wins",player1.name);
+    }
+    else if(turntracker == 2)
+    {
+        printf("%s wins",player2.name);
+    }
+    breaker();
 }
 ///
 /// Runs a turn of the game
@@ -150,17 +223,16 @@ int runTurn(struct player* main,struct player* second)
     int column;
     int row;
     int failsafe = 1;
-    int verify = 1;
-    int game;//0 for game over
-             //1 for game on
+    int game = 0;//0 for game over
+                 //1 keep turn
+                 //2 switch turns
 
     clrscr();
-    printf("%s\n",main->name);
+    printf("%s's Turn\n",main->name);
     displayBoard(main->View);
 
-    while(verify != 0)
-    {
-        game = 0;
+
+
         while(failsafe != 0)//to make sure they select a valid column
         {
             printf("Choose location\n");
@@ -199,17 +271,17 @@ int runTurn(struct player* main,struct player* second)
             //Change main view display into a H
             main->View[row][column].display = 'H';
             clrscr();
-            printf("%s\n",main->name);
+            printf("%s's Turn\n",main->name);
             displayBoard(main->View);
             printf("That was a Hit\n");
             //Change second board symbol into a X
             second->Board[row][column].display = 'X';
             //Reduce the length of the ship with that id
-            second->Ships[second->Board[row][column].battleshipid]--;
+            second->Ships[(second->Board[row][column].battleshipid) - 1]--;
             //Check to see if ship is completely destroyed
-            if(second->Ships[second->Board[row][column].battleshipid] == 0)
+            if(second->Ships[(second->Board[row][column].battleshipid) - 1] == 0)
             {
-                printf("%s sunk a battleship",main->name);
+                printf("%s sunk a battleship\n",main->name);
             }
             //Change second board id to 11
             second->Board[row][column].battleshipid = 11;
@@ -222,15 +294,17 @@ int runTurn(struct player* main,struct player* second)
                     //The game is still on
                 }
             }
-            if(game == 0)
-            {
-                return 0; //game over
-            }
+            breaker();
+            return game;
+
         }
         else if((second->Board[row][column].battleshipid) == 11)//The selected place has already been searched
         {
             printf("This spot has already been selected\n"
                    "Try again\n");
+            breaker();
+            game = 1;
+            return game;
         }
         else//Theres no ship there
         {
@@ -240,17 +314,16 @@ int runTurn(struct player* main,struct player* second)
             second->Board[row][column].battleshipid = 11;
 
             clrscr();
-            printf("%s\n",main->name);
+            printf("%s's Turn\n",main->name);
             displayBoard(main->View);
             printf("That was a miss\n");
-            printf("Enter any key to switch turns\n");
-            char breaker;
-            scanf("%c",&breaker);
-            verify = 0;
+            breaker();
+            game = 2;
+            return game;
         }
 
-    }
-    return 1;//game continues
+
+
 }
 ///
 ///Automatically done turn
@@ -261,16 +334,10 @@ int autoRunTurn(struct player* main,struct player* second)
     //main guesses a point
     int column;
     int row;
-    int verify = 1;
-    int game;//0 for game over
-             //1 for game on
+    int game = 0;//0 for game over
+                 //1 keep turn
+                 //2 switch turns
 
-    clrscr();
-    printf("%s\n",main->name);
-    displayBoard(second->Board);
-
-    while(verify != 0)
-    {
         game = 0;
         column = rand()%10;
 
@@ -283,15 +350,15 @@ int autoRunTurn(struct player* main,struct player* second)
             //Change second board symbol into a X
             second->Board[row][column].display = 'X';
             clrscr();
-            printf("%s\n",main->name);
+            printf("%s's Turn\n",main->name);
             displayBoard(second->Board);
             printf("That was a Hit\n");
             //Reduce the length of the ship with that id
-            second->Ships[second->Board[row][column].battleshipid]--;
+            second->Ships[(second->Board[row][column].battleshipid) - 1]--;
             //Check to see if ship is completely destroyed
-            if(second->Ships[second->Board[row][column].battleshipid] == 0)
+            if(second->Ships[(second->Board[row][column].battleshipid) - 1] == 0)
             {
-                printf("%s sunk a battleship",main->name);
+                printf("%s sunk a battleship\n",main->name);
             }
             //Change second board id to 11
             second->Board[row][column].battleshipid = 11;
@@ -304,35 +371,33 @@ int autoRunTurn(struct player* main,struct player* second)
                     //The game is still on
                 }
             }
-            if(game == 0)
-            {
-                return 0; //game over
-            }
-            printf("Enter any key to continue\n");
-            char breaker1;
-            scanf("%c",&breaker1);
+            breaker();
+            return game;
+
         }
         else if((second->Board[row][column].battleshipid) == 11)//The selected place has already been searched
         {
+            game = 1;
+            return game;
         }
         else//Theres no ship there
         {
             //Change main view display into a M
             main->View[row][column].display = 'M';
+            second->Board[row][column].display = 'O';
             //Change second board id to 11
             second->Board[row][column].battleshipid = 11;
 
             clrscr();
-            printf("%s\n",main->name);
+            printf("%s's Turn\n",main->name);
             displayBoard(second->Board);
             printf("That was a miss\n");
-            printf("Enter any key to switch turns\n");
-            char breaker2;
-            scanf("%c",&breaker2);
-            verify = 0;
+            breaker();
+            game = 2;
+            return game;
         }
 
-    }
+
     return 1;//game continues
 }
 ///
@@ -476,14 +541,10 @@ void autoPlaceBattleShips(struct gridpoint board[][10],struct gridpoint heur[][1
               while(failsafe != 0)//to make sure they select a valid orientation
               {
                   //Prompt to pick 1.horizontal or 2.vertical
-                  choice = rand()%10;
+                  choice = rand()%3;
                   if(choice >= 1 && choice <= 2)
                   {
                       failsafe = 0;
-                  }
-                  else
-                  {
-                      printf("Invalid choice. Try again\n");
                   }
 
               }
@@ -500,10 +561,6 @@ void autoPlaceBattleShips(struct gridpoint board[][10],struct gridpoint heur[][1
                 }
                 else
                 {
-                    clrscr();
-                    printf("%s\n",playerName);
-                    displayBoard(board);
-                    printf("Invalid placement. Try again\n");
                     failsafe = 1;
                 }
                 break;
@@ -519,10 +576,6 @@ void autoPlaceBattleShips(struct gridpoint board[][10],struct gridpoint heur[][1
                 }
                 else
                 {
-                    clrscr();
-                    printf("%s\n",playerName);
-                    displayBoard(board);
-                    printf("Invalid placement. Try again\n");
                     failsafe = 1;
                 }
                 break;
@@ -540,7 +593,7 @@ void vericalPlacement(struct gridpoint game[][size],struct gridpoint heur[][size
     //Change game board
     for(int i = 0;i < shipLenght;i++)
     {
-        game[row + i][col].display = 'O';
+        game[row + i][col].display = 'S';
         game[row + i][col].battleshipid = shipid + 1;
     }
 
@@ -551,13 +604,25 @@ void vericalPlacement(struct gridpoint game[][size],struct gridpoint heur[][size
         heur[place][col].battleshipid = 1;
         //mark points around this point
         //above
-        heur[place - 1][col].battleshipid = 1;
+        if(place - 1 >= 0 && place - 1 <= 9)
+        {
+            heur[place - 1][col].battleshipid = 1;
+        }
         //below
-        heur[place + 1][col].battleshipid = 1;
+        if(place + 1 >= 0 && place + 1 <= 9)
+        {
+            heur[place + 1][col].battleshipid = 1;
+        }
         //left
-        heur[place][col - 1].battleshipid = 1;
+        if(col - 1 >= 0 && col - 1 <= 9)
+        {
+            heur[place][col - 1].battleshipid = 1;
+        }
         //right
-        heur[place][col + 1].battleshipid = 1;
+        if(col + 1 >= 0 && col + 1 <= 9)
+        {
+            heur[place][col + 1].battleshipid = 1;
+        }
     }
 }
 ///
@@ -568,23 +633,35 @@ void horizontalPlacement(struct gridpoint game[][size],struct gridpoint heur[][s
     //Change game board
     for(int i = 0;i < shipLenght;i++)
     {
-        game[row][col + i].display = 'O';
+        game[row][col + i].display = 'S';
         game[row][col + i].battleshipid = shipid + 1;
     }
     //change hueristic board
     for(int i = 0;i < shipLenght;i++)
     {
         int place = col + i;
-        game[place][col].battleshipid = 1;
+        heur[row][place].battleshipid = 1;
         //mark points around this point
         //above
-        heur[row - 1][place].battleshipid = 1;
+        if(row - 1 >= 0 && row - 1 <= 9)
+        {
+            heur[row - 1][place].battleshipid = 1;
+        }
         //below
-        heur[row + 1][place].battleshipid = 1;
+        if(row + 1 >= 0 && row + 1 <= 9)
+        {
+            heur[row + 1][place].battleshipid = 1;
+        }
         //left
-        heur[row][place - 1].battleshipid = 1;
+        if(place - 1 >= 0 && place - 1 <= 9)
+        {
+            heur[row][place - 1].battleshipid = 1;
+        }
         //right
-        heur[row][place + 1].battleshipid = 1;
+        if(place - 1 >= 0 && place - 1 <= 9)
+        {
+            heur[row][place + 1].battleshipid = 1;
+        }
     }
 }
 ///
@@ -617,9 +694,6 @@ int horizontalValidation(struct gridpoint heur[][size],int row,int col,int shipL
 {
     int output = 1;
     //validate starting point
-    printf("%d\n",shipLenght);
-    printf("%d\n",col);
-    printf("%d\n",shipLenght + row);
     //make sure it fits
     if((col + shipLenght) > size)
     {
@@ -646,7 +720,7 @@ void playerInit(struct player* aBoard)
     {
         for(int j = 0;j < size;j++)
         {
-            aBoard->View[i][j].display = '?';
+            aBoard->View[i][j].display = '*';
             aBoard->View[i][j].battleshipid = 0;
         }
     }
@@ -655,7 +729,6 @@ void playerInit(struct player* aBoard)
     {
         for(int j = 0;j < size;j++)
         {
-            aBoard->Heur[i][j].display = '?';
             aBoard->Heur[i][j].battleshipid = 0;
         }
     }
@@ -664,7 +737,7 @@ void playerInit(struct player* aBoard)
     {
         for(int j = 0;j < size;j++)
         {
-            aBoard->Board[i][j].display = '?';
+            aBoard->Board[i][j].display = '*';
             aBoard->Board[i][j].battleshipid = 0;
         }
     }
@@ -685,14 +758,14 @@ void playerInit(struct player* aBoard)
 ///
 void displayBoard(struct gridpoint board[][10])
 {
-    printf(".\tA\tB\tC\tD\tE\tF\tG\tH\tI\tJ\n");
+    printf(" . A B C D E F G H I J\n");
     for(int i = 1;i <= size;i++)
     {
-        printf("%d\t",i);
+        printf("%2d ",i);
 
         for(int j = 1;j <= size;j++)
         {
-            printf("%c\t",board[i - 1][j - 1].display);
+            printf("%c ",board[i - 1][j - 1].display);
             if(j == size)
             {
                 printf("\n");
@@ -702,7 +775,7 @@ void displayBoard(struct gridpoint board[][10])
     printf("\n\n");
 }
 ///
-///Prints prompt to choose clomun
+///Prints prompt to choose column
 ///
 void chooseColumn()
 {
@@ -727,4 +800,12 @@ void clrscr()
 {
     system("@cls||clear");
 }
-
+///
+///To pause the program
+///
+void breaker()
+{
+    char breaker[3];
+    printf("Enter any key to continue\n");
+    scanf("%2s",breaker);
+}

@@ -1,0 +1,224 @@
+[1mdiff --git a/BattleShip.depend b/BattleShip.depend[m
+[1mindex 295cd9c..0bd6c57 100644[m
+[1m--- a/BattleShip.depend[m
+[1m+++ b/BattleShip.depend[m
+[36m@@ -4,7 +4,7 @@[m
+ 	<stdlib.h>[m
+ 	"battleShipLogic.h"[m
+ [m
+[31m-1624982340 source:c:\users\user\documents\c\battleship\main.c[m
+[32m+[m[32m1625154419 source:c:\users\user\documents\c\battleship\main.c[m
+ 	<stdio.h>[m
+ 	<stdlib.h>[m
+ 	"Logic.h"[m
+[36m@@ -22,13 +22,13 @@[m
+ [m
+ 1624982256 c:\users\user\documents\c\battleship\gridpoint.h[m
+ [m
+[31m-1624982256 source:c:\users\user\documents\c\battleship\logic.c[m
+[32m+[m[32m1625154437 source:c:\users\user\documents\c\battleship\logic.c[m
+ 	<stdio.h>[m
+ 	<stdlib.h>[m
+ 	<time.h>[m
+ 	"Logic.h"[m
+ 	"GridPoint.h"[m
+ [m
+[31m-1624982256 c:\users\user\documents\c\battleship\logic.h[m
+[32m+[m[32m1625154459 c:\users\user\documents\c\battleship\logic.h[m
+ 	"GridPoint.h"[m
+ [m
+[1mdiff --git a/Logic.c b/Logic.c[m
+[1mindex 010df92..55a59d4 100644[m
+[1m--- a/Logic.c[m
+[1m+++ b/Logic.c[m
+[36m@@ -80,12 +80,15 @@[m [mvoid twoPlayerGame()[m
+     typedef struct player Player;[m
+     Player player1;[m
+     Player player2;[m
+[31m-[m
+[32m+[m[32m    int turntracker = 1;//Player 1 goes first[m
+[32m+[m[32m                        //1. for player 1's turn[m
+[32m+[m[32m                        //2. for player 2's turn[m
+     int turn;//set to[m
+[31m-             //1. for player 1[m
+[31m-             //2. for player 2[m
+[32m+[m[32m             //1. to keep turn[m
+[32m+[m[32m             //2. to switch turns[m
+              //0.to end game[m
+ [m
+[32m+[m
+     playerInit(&player1);[m
+     playerInit(&player2);[m
+     char p1[10] = "Player 1";[m
+[36m@@ -100,46 +103,70 @@[m [mvoid twoPlayerGame()[m
+     {[m
+         placeBattleShips(player1.Board,player1.Heur,player1.Ships[i],i,player1.name);[m
+     }[m
+[32m+[m[32m    clrscr();[m
+[32m+[m[32m    displayBoard(player1.Board);[m
+[32m+[m[32m    breaker();[m
+     //let player two set his battleships[m
+     for(int i = size - 1;i >= 0;i--)[m
+     {[m
+         placeBattleShips(player2.Board,player2.Heur,player2.Ships[i],i,player2.name);[m
+     }[m
+[32m+[m[32m    clrscr();[m
+[32m+[m[32m    displayBoard(player1.Board);[m
+[32m+[m[32m    breaker();[m
+ [m
+     //take turns playing[m
+[31m-    turn = 1;//lets player 1 go first[m
+[32m+[m[32m    if(turntracker == 1)[m
+[32m+[m[32m    {[m
+[32m+[m[32m        turn = runTurn(&player1,&player2);[m
+[32m+[m[32m    }[m
+[32m+[m[32m    else if(turntracker == 2)[m
+[32m+[m[32m    {[m
+[32m+[m[32m        turn = runTurn(&player2,&player1);[m
+[32m+[m[32m    }[m
+[32m+[m
+     while(turn != 0)[m
+     {[m
+         switch(turn)[m
+         {[m
+[31m-        case 1:[m
+[31m-            //Player 1 runTurn()[m
+[31m-            if(runTurn(&player1,&player2) == 0)[m
+[32m+[m[32m        case 1://Depending on whose turn it was before they'll play again[m
+[32m+[m[32m            if(turntracker == 1)[m
+             {[m
+[31m-                turn = 0;//End game[m
+[32m+[m[32m                turn = runTurn(&player1,&player2);[m
+             }[m
+[31m-            else[m
+[32m+[m[32m            else if(turntracker == 2)[m
+             {[m
+[31m-                turn = 2;//Switch to player 2's turn[m
+[32m+[m[32m                turn = runTurn(&player2,&player1);[m
+             }[m
+[32m+[m
+             break;[m
+ [m
+[31m-        case 2:[m
+[31m-            //Player 2 runTurn()[m
+[31m-            if(runTurn(&player2,&player1) == 0)[m
+[32m+[m[32m        case 2://First switch turns[m
+[32m+[m[32m            if(turntracker == 1)[m
+             {[m
+[31m-                turn = 0;//End game[m
+[32m+[m[32m                turntracker = 2;[m
+             }[m
+[31m-            else[m
+[32m+[m[32m            else if(turntracker == 2)[m
+             {[m
+[31m-                turn = 1;//Switch to player 1's turn[m
+[32m+[m[32m                turntracker = 1;[m
+[32m+[m[32m            }[m
+[32m+[m[32m            //Then let the next person play their turn[m
+[32m+[m[32m            if(turntracker == 1)[m
+[32m+[m[32m            {[m
+[32m+[m[32m                turn = runTurn(&player1,&player2);[m
+             }[m
+[32m+[m[32m            else if(turntracker == 2)[m
+[32m+[m[32m            {[m
+[32m+[m[32m                turn = runTurn(&player2,&player1);[m
+[32m+[m[32m            }[m
+[32m+[m
+             break;[m
+         }[m
+     }[m
+ [m
+ [m
+ [m
+[32m+[m
+ }[m
+ ///[m
+ /// Runs a turn of the game[m
+[36m@@ -150,17 +177,16 @@[m [mint runTurn(struct player* main,struct player* second)[m
+     int column;[m
+     int row;[m
+     int failsafe = 1;[m
+[31m-    int verify = 1;[m
+[31m-    int game;//0 for game over[m
+[31m-             //1 for game on[m
+[32m+[m[32m    int game = 0;//0 for game over[m
+[32m+[m[32m                 //1 keep turn[m
+[32m+[m[32m                 //2 switch turns[m
+ [m
+     clrscr();[m
+[31m-    printf("%s\n",main->name);[m
+[32m+[m[32m    printf("%s's Turn\n",main->name);[m
+     displayBoard(main->View);[m
+ [m
+[31m-    while(verify != 0)[m
+[31m-    {[m
+[31m-        game = 0;[m
+[32m+[m
+[32m+[m
+         while(failsafe != 0)//to make sure they select a valid column[m
+         {[m
+             printf("Choose location\n");[m
+[36m@@ -202,6 +228,8 @@[m [mint runTurn(struct player* main,struct player* second)[m
+             printf("%s\n",main->name);[m
+             displayBoard(main->View);[m
+             printf("That was a Hit\n");[m
+[32m+[m[32m            printf("Other player's board\n");[m
+[32m+[m[32m            displayid(second->Board);[m
+             //Change second board symbol into a X[m
+             second->Board[row][column].display = 'X';[m
+             //Reduce the length of the ship with that id[m
+[36m@@ -209,7 +237,7 @@[m [mint runTurn(struct player* main,struct player* second)[m
+             //Check to see if ship is completely destroyed[m
+             if(second->Ships[second->Board[row][column].battleshipid] == 0)[m
+             {[m
+[31m-                printf("%s sunk a battleship",main->name);[m
+[32m+[m[32m                printf("%s sunk a battleship\n",main->name);[m
+             }[m
+             //Change second board id to 11[m
+             second->Board[row][column].battleshipid = 11;[m
+[36m@@ -222,15 +250,17 @@[m [mint runTurn(struct player* main,struct player* second)[m
+                     //The game is still on[m
+                 }[m
+             }[m
+[31m-            if(game == 0)[m
+[31m-            {[m
+[31m-                return 0; //game over[m
+[31m-            }[m
+[32m+[m[32m            breaker();[m
+[32m+[m[32m            return game;[m
+[32m+[m
+         }[m
+         else if((second->Board[row][column].battleshipid) == 11)//The selected place has already been searched[m
+         {[m
+             printf("This spot has already been selected\n"[m
+                    "Try again\n");[m
+[32m+[m[32m            breaker();[m
+[32m+[m[32m            game = 1;[m
+[32m+[m[32m            return game;[m
+         }[m
+         else//Theres no ship there[m
+         {[m
+[36m@@ -243,14 +273,15 @@[m [mint runTurn(struct player* main,struct player* second)[m
+             printf("%s\n",main->name);[m
+             displayBoard(main->View);[m
+             printf("That was a miss\n");[m
+[31m-            printf("Enter any key to switch turns\n");[m
+[31m-            char breaker;[m
+[31m-            scanf("%c",&breaker);[m
+[31m-            verify = 0;[m
+[32m+[m[32m            printf("Other player's board\n");[m
+[32m+[m[32m            displayid(second->Board);[m
+[32m+[m[32m            breaker();[m
+[32m+[m[32m            game = 2;[m
+[32m+[m[32m            return game;[m
+         }[m
+ [m
+[31m-    }[m
+[31m-    return 1;//game continues[m
+[32m+[m
+[32m+[m
+ }[m
+ ///[m
+ ///Automatically done turn[m
+[36m@@ -266,7 +297,7 @@[m [mint autoRunTurn(struct player* main,struct player* second)[m
+              //1 for game o

@@ -1,0 +1,34 @@
+# depslib dependency file v1.0
+1624863988 source:c:\users\user\documents\c\battleship\battleshiplogic.c
+	<stdio.h>
+	<stdlib.h>
+	"battleShipLogic.h"
+
+1624982340 source:c:\users\user\documents\c\battleship\main.c
+	<stdio.h>
+	<stdlib.h>
+	"Logic.h"
+
+1624834013 c:\users\user\documents\c\battleship\battleshiplogic.c
+	<stdio.h>
+	<stdlib.h>
+
+1624863988 c:\users\user\documents\c\battleship\battleshiplogic.h
+
+1624982256 source:c:\users\user\documents\c\battleship\gridpoint.c
+	<stdio.h>
+	<stdlib.h>
+	"GridPoint.h"
+
+1624982256 c:\users\user\documents\c\battleship\gridpoint.h
+
+1624982256 source:c:\users\user\documents\c\battleship\logic.c
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+	"Logic.h"
+	"GridPoint.h"
+
+1624982256 c:\users\user\documents\c\battleship\logic.h
+	"GridPoint.h"
+
